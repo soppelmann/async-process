@@ -13,7 +13,7 @@ jobs:
     env:
       OS_NAME: unknown
       ARCH_NAME: unknown
-      DLL_NAME: libasyncprocess.so
+      LIB_NAME: libasyncprocess.a
       RESULT_NAME: result-linux
       RESULT_PATH: result-linux
       RESULT_PATH_SUB: result-async/static
@@ -34,13 +34,20 @@ jobs:
     - name: Build
       run: |
         gcc -v
-        rm static/$ARCH_NAME/$OS_NAME/$DLL_NAME
-        ./bootstrap
+        # Generate build system
+        libtoolize --copy --force --quiet
+        aclocal
+        autoheader
+        automake --add-missing --copy --foreign
+        autoconf
+        # Configure for static build
+        ./configure --enable-static --disable-shared LDFLAGS="-static"
+        make
     - name: Copy Result
       if: always()
       run: |
         mkdir -p $RESULT_PATH/$RESULT_PATH_SUB/$ARCH_NAME/$OS_NAME
-        cp static/$ARCH_NAME/$OS_NAME/$DLL_NAME $RESULT_PATH/$RESULT_PATH_SUB/$ARCH_NAME/$OS_NAME
+        cp .libs/$LIB_NAME $RESULT_PATH/$RESULT_PATH_SUB/$ARCH_NAME/$OS_NAME/
     - name: Upload Result
       if: always()
       uses: actions/upload-artifact@v1
@@ -54,7 +61,7 @@ jobs:
     env:
       OS_NAME: Linux
       ARCH_NAME: aarch64
-      DLL_NAME: libasyncprocess.so
+      LIB_NAME: libasyncprocess.a
       RESULT_NAME: result-linux-aarch64
       RESULT_PATH: result-linux-aarch64
       RESULT_PATH_SUB: result-async/static
@@ -75,13 +82,20 @@ jobs:
           uname
           uname -m
           gcc -v
-          rm static/${{ env.ARCH_NAME }}/${{ env.OS_NAME }}/${{ env.DLL_NAME }}
-          ./bootstrap
+          # Generate build system
+          libtoolize --copy --force --quiet
+          aclocal
+          autoheader
+          automake --add-missing --copy --foreign
+          autoconf
+          # Configure for static build
+          ./configure --enable-static --disable-shared LDFLAGS="-static"
+          make
     - name: Copy Result
       if: always()
       run: |
         mkdir -p $RESULT_PATH/$RESULT_PATH_SUB/$ARCH_NAME/$OS_NAME
-        cp static/$ARCH_NAME/$OS_NAME/$DLL_NAME $RESULT_PATH/$RESULT_PATH_SUB/$ARCH_NAME/$OS_NAME
+        cp .libs/$LIB_NAME $RESULT_PATH/$RESULT_PATH_SUB/$ARCH_NAME/$OS_NAME/
     - name: Upload Result
       if: always()
       uses: actions/upload-artifact@v1
@@ -95,7 +109,7 @@ jobs:
     env:
       OS_NAME: unknown
       ARCH_NAME: unknown
-      DLL_NAME: libasyncprocess.so
+      LIB_NAME: libasyncprocess.a
       RESULT_NAME: result-osx
       RESULT_PATH: result-osx
       RESULT_PATH_SUB: result-async/static
@@ -113,20 +127,24 @@ jobs:
     - name: Install tools
       run: |
         brew install automake
-        #brew install libtool
-        which glibtoolize
-        ln -s /usr/local/bin/glibtoolize /usr/local/bin/libtoolize
-        which libtoolize
+        brew install libtool
     - name: Build
       run: |
         gcc -v
-        rm static/$ARCH_NAME/$OS_NAME/$DLL_NAME
-        ./bootstrap
+        # Generate build system
+        glibtoolize --copy --force --quiet
+        aclocal
+        autoheader
+        automake --add-missing --copy --foreign
+        autoconf
+        # Configure for static build
+        ./configure --enable-static --disable-shared
+        make
     - name: Copy Result
       if: always()
       run: |
         mkdir -p $RESULT_PATH/$RESULT_PATH_SUB/$ARCH_NAME/$OS_NAME
-        cp static/$ARCH_NAME/$OS_NAME/$DLL_NAME $RESULT_PATH/$RESULT_PATH_SUB/$ARCH_NAME/$OS_NAME
+        cp .libs/$LIB_NAME $RESULT_PATH/$RESULT_PATH_SUB/$ARCH_NAME/$OS_NAME/
     - name: Upload Result
       if: always()
       uses: actions/upload-artifact@v1

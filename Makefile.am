@@ -1,3 +1,4 @@
+lib_LTLIBRARIES = libasyncprocess.la
 libasyncprocess_la_LDFLAGS = -version-info 0:0:0 -no-undefined
 libasyncprocess_la_SOURCES = src/async-process.c
 
