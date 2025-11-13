@@ -1,5 +1,3 @@
-ACLOCAL_AMFLAGS = -I m4
-
 libasyncprocess_la_LDFLAGS = -version-info 0:0:0 -no-undefined
 libasyncprocess_la_SOURCES = src/async-process.c
 
