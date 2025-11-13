@@ -1,6 +1,5 @@
 AC_INIT([async-process], [0.1])
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_MACRO_DIRS([m4])
 
 # Set default prefix based on platform if not specified
 AC_PREFIX_DEFAULT([/usr/local])
