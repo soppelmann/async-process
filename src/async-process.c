@@ -1,11 +1,20 @@
 #include "async-process.h"
 
+// OpenBSD-compatible PTY opening function
+// Based on fix by rpx99 (https://github.com/rpx99)
 static const char* open_pty(int *out_fd)
 {
-  int fd = posix_openpt(O_RDWR | O_CLOEXEC | O_NOCTTY);
+  int fd = posix_openpt(O_RDWR | O_NOCTTY);
   if (fd < 0) return NULL;
-  if (grantpt(fd) == -1 || unlockpt(fd) == -1) return NULL;
-  fcntl(fd, F_SETFD, FD_CLOEXEC);
+  if (fcntl(fd, F_SETFD, FD_CLOEXEC) == -1) {
+    close(fd);
+    return NULL;
+  }
+
+  if (grantpt(fd) == -1 || unlockpt(fd) == -1) {
+    close(fd);
+    return NULL;
+  }
   const char *name = ptsname(fd);
   if (name == NULL) {
     close(fd);
