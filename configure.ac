@@ -48,6 +48,10 @@ AC_MSG_NOTICE([
   C Compiler:          $CC
   Host system:         $host_os
 
+  Note: This C library is for Unix-like systems only (Linux, FreeBSD, macOS).
+  Windows support is provided via pure Lisp CFFI implementation and does not
+  require C compilation.
+
   You can now run 'make' to build the library.
   After building, run 'make install' to install to the prefix.
 
